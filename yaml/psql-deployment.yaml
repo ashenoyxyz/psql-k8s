@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: psql-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: psql
+  template:
+    metadata:
+      labels:
+        app: psql
+    spec:
+      containers:
+        - name: psql-container
+          image: 'postgres:14'
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - configMapRef:
+                name: psql-secret
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: psql-volume
+      volumes:
+        - name: psql-volume
+          persistentVolumeClaim:
+            claimName: psql-pvc
